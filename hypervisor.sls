@@ -28,6 +28,22 @@ virt_hypervisor__file_/etc/sysconfig/libvirtd:
       - 'LIBVIRTD_ARGS="--listen"'
 #}
 
+{% set qemusecgroups = salt['pillar.get']('virt:qemusecgroups') %}
+{% if qemusecgroups is defined and qemusecgroups %}
+virt_hypervisor__user_qemu:
+  user.present:
+    - name: qemu
+    - require:
+      - pkg: virt_hypervisor__pkg_libvirt
+    - watch_in:
+      - service: virt_hypervisor__service_libvirt
+    - remove_groups: False
+    - groups: 
+      {% for group in qemusecgroups -%}
+      - {{ group }}
+      {% endfor %}
+{% endif %}
+
 {% set hostid = salt['pillar.get']('virt:hostid') %}
 {% if hostid is defined and hostid != '' %}
 virt_hypervisor__file_/etc/libvirt/libvirtd.conf:
@@ -36,6 +52,8 @@ virt_hypervisor__file_/etc/libvirt/libvirtd.conf:
     - context: /files/etc/libvirt/libvirtd.conf
     - changes:
       - set host_uuid {{hostid}}
+    - require:
+      - pkg: virt_hypervisor__pkg_libvirt
     - watch_in:
       - service: virt_hypervisor__service_libvirt
 {% endif %}
