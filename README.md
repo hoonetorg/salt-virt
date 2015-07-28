@@ -1,1 +1,1 @@
-# salt-virt
+# salt-virt-formula
