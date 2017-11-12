@@ -6,7 +6,7 @@ virt_ceph__file_/etc/ceph:
     - mode: 755
     - makedirs: True
 
-{% set cluster = salt['pillar.get']('cephname') -%}
+{% set cluster = salt['pillar.get']('cephname', "ceph") -%}
 {% if cluster != '' %}
 {% set cluster_data = salt['pillar.get']('virt:ceph:clusters:' + cluster ,{}) -%}
 
@@ -50,7 +50,7 @@ virt_ceph__libvirt_secret_set_value_{{cluster}}_{{secret}}:
 {% set autostart = False %}
 {% endif %}
 {% set secretuuid =  salt['pillar.get']('virt:ceph:clusters:' + cluster + ':secrets:' + secret + ':secretuuid', False) -%}
-{% set cluster_ceph_data = salt['pillar.get']('ceph:lookup:clusters:' + cluster ,{}) -%}
+{# set cluster_ceph_data = salt['pillar.get']('ceph:lookup:clusters:' + cluster ,{}) -#}
 
 virt_ceph__file_/etc/ceph/pool-{{cluster}}-{{pool}}.xml:
   file.managed:
@@ -59,7 +59,7 @@ virt_ceph__file_/etc/ceph/pool-{{cluster}}-{{pool}}.xml:
         <pool type='rbd'>
           <name>{{pool}}</name>
           <source>
-{% for mon, mon_data in cluster_ceph_data.mons.items()|sort %}
+{% for mon in cluster_data.mons|sort %}
             <host name='{{mon}}' port='6789'/>
 {% endfor %}
             <name>{{pool}}</name>
