@@ -14,3 +14,7 @@ virt_vms__libvirtxmls_vms_{{vmsprofile}}:
 
 {% endfor %}
 
+#create
+#virsh vol-create-as --name vmdisk1 --pool libvirt --capacity 30GiB
+#unless
+#virsh vol-info --pool libvirt --vol vmdisk1
