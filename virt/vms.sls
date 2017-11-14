@@ -12,9 +12,30 @@ virt_vms__libvirtxmls_vms_{{vmsprofile}}:
     - template: jinja
     - source: salt://virt/files/xml/{{vmsprofile}}
 
-{% endfor %}
+  {% for image, image_data in vmsprofile_data.get('images', {}).items() %}
 
-#create
-#virsh vol-create-as --name vmdisk1 --pool libvirt --capacity 30GiB
-#unless
-#virsh vol-info --pool libvirt --vol vmdisk1
+    {% if image_data.get('method', 'rsync') in  [ 'rsync' ] %}
+virt_vms__libvirt_images_{{vmsprofile}}_{{image}}:
+  rsync.synchronized:
+    - name: {{virt.vms.imagesfolder}}/{{vmsprofile}}
+    - source: {{image_data.source}}
+    - prepare: True
+
+    {% elif image_data.get('method', 'rsync') in  [ 'url' ] %}
+virt_vms__libvirt_images_{{vmsprofile}}_{{image}}:
+  file.managed:
+    - name: {{virt.vms.imagesfolder}}/{{vmsprofile}}/{{image}}
+    - source: {{image_data.source}}
+      {% if image_data.get('source_hash', False ) %}
+    - source_hash: {{image_data.source_hash}}
+      {% endif %}
+    - makedirs: True
+    - user: root
+    - group: root
+    - mode: "0644"
+
+    {% endif %}
+
+  {% endfor %}
+
+{% endfor %}

@@ -104,3 +104,12 @@ virt_ceph__libvirt_pool_autostart_{{cluster}}_{{pool}}:
 {% endfor %}
 
 {% endif %}
+
+
+
+
+#create
+#virsh vol-create-as --name vmdisk1 --pool libvirt --capacity 30GiB
+#unless
+#virsh vol-info --pool libvirt --vol vmdisk1
+
