@@ -107,35 +107,3 @@ virt_ceph__libvirt_pool_autostart_{{cluster}}_{{pool}}:
 
 {% endif %}
 
-{% for vmsprofile, vmsprofile_data in virt.get('vms', {}).get('profiles',{}).items()|sort %}
-
-  {% for rbd, rbd_data in vmsprofile_data.get('rbds', {}).items() %}
-
-    {% if rbd_data.get('method', 'create') in  [ 'create' ] %}
-virt_ceph__create_rbd_{{vmsprofile}}_{{rbd}}:
-  cmd.run:
-    - name: qemu-img create -f rbd rbd:{{rbd_data.get('pool', 'libvirt')}}/{{rbd}} {{rbd_data.size}}
-    - unless: qemu-img info rbd:{{rbd_data.get('pool', 'libvirt')}}/{{rbd}}
-
-    {% elif rbd_data.get('method', 'create') in  [ 'convert' ] %}
-virt_ceph__convert_rbd_{{vmsprofile}}_{{rbd}}:
-  cmd.run:
-    - name: qemu-img convert -f {{rbd_data.get('sourcefmt', 'raw')}} -O rbd {{rbd_data.get('source')}} rbd:{{rbd_data.get('pool', 'libvirt')}}/{{rbd}}
-    - unless: qemu-img info rbd:{{rbd_data.get('pool', 'libvirt')}}/{{rbd}}
-
-      {% if rbd_data.get('size', False) %}
-virt_ceph__resize_rbd_{{vmsprofile}}_{{rbd}}:
-  cmd.wait:
-    - name: qemu-img resize -f rbd rbd:{{rbd_data.get('pool', 'libvirt')}}/{{rbd}} {{rbd_data.size}}
-    - watch:
-      - cmd: virt_ceph__convert_rbd_{{vmsprofile}}_{{rbd}}
-      {% endif %}
-
-    {% endif %}
-
-  {% endfor %}
-
-{% endfor %}
-
-
-
