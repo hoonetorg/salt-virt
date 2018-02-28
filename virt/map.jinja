@@ -17,6 +17,14 @@ base:
     state: running
     enable: True
   conffile: '/etc/virt/virt.ini'
+  agent:
+    pkgs:
+      - qemu-guest-agent
+    service:
+      name: qemu-guest-agent
+      state: running
+      enable: True
+
 
   # default settings
   conf:
