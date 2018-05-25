@@ -1,6 +1,5 @@
 virt_hypervisor__pkg_libvirt:
   pkg.installed:
-    - name: libvirt
 {% set slsrequires =salt['pillar.get']('virt:slsrequires', False) %}
 {% if slsrequires is defined and slsrequires %}
     - require:
