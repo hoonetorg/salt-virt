@@ -24,7 +24,7 @@ virt_vms_storage__convert_disk_{{vmsprofile}}_{{disk}}:
 
       {% else %}
       {% set drbd_resource = disk|regex_search('^.*/dev/drbd/by-res/(.*)/[0-9]+\s*$') %}
-    - onlyif: test -b {{disk}} && test -w {{disk}} && drbdadm role {{ drbd_resource[0] }}|grep Secondary
+    - onlyif: test -b {{disk}} && test -w {{disk}} && drbdadm role {{ drbd_resource[0] }}|grep -w "^{{disk_data.get('drbd_role', 'Secondary')}}"
     - unless: '! dd if={{disk}} of=/dev/null bs=1 count=1 || blkid -c /dev/null {{disk}}'
       {% endif %}
 
