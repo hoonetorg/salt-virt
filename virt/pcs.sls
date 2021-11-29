@@ -52,5 +52,5 @@ virt_pcs__cib_pushed_{{pcs.virt_cib}}:
 
 virt_pcs__empty_sls_prevent_error:
   cmd.run:
-    - name: true
-    - unless: true
+    - name: "true"
+    - unless: "true"
